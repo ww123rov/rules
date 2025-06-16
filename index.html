@@ -1,593 +1,429 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DART404 - Правила сервера</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
-            line-height: 1.6;
-            background-image: radial-gradient(circle at 50% 50%, #151515 0%, #101010 50%, #080808 100%);
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        
-        header {
-            text-align: center;
-            padding: 40px 0;
-            position: relative;
-            overflow: hidden;
-            background-color: #1a1a1a;
-            border-radius: 16px 16px 0 0;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .logo-container {
-            position: relative;
-            height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .server-name {
-            font-size: 4rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #ff3d00 0%, #ff9e80 50%, #ff3d00 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-            z-index: 1;
-            text-shadow: 0 0 15px rgba(255, 61, 0, 0.5);
-            animation: pulse 3s infinite;
-            user-select: none;
-        }
-        
-        @keyframes pulse {
-            0% { filter: drop-shadow(0 0 5px rgba(255, 61, 0, 0.5)); }
-            50% { filter: drop-shadow(0 0 15px rgba(255, 61, 0, 0.8)); }
-            100% { filter: drop-shadow(0 0 5px rgba(255, 61, 0, 0.5)); }
-        }
-        
-        .cyber-lines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            background-image: repeating-linear-gradient(0deg, #ff3d00, #ff3d00 1px, transparent 1px, transparent 10px),
-                              repeating-linear-gradient(90deg, #ff3d00, #ff3d00 1px, transparent 1px, transparent 10px);
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            color: #ffffff;
-        }
-        
-        .subtitle {
-            font-size: 1rem;
-            color: #aaaaaa;
-            margin-bottom: 20px;
-        }
-        
-        .rules-container {
-            background-color: #1a1a1a;
-            border-radius: 0 0 16px 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .rule-item {
-            border-bottom: 1px solid #2a2a2a;
-            transition: all 0.3s ease;
-        }
-        
-        .rule-item:last-child {
-            border-bottom: none;
-        }
-        
-        .rule-header {
-            padding: 18px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s ease;
-            position: relative;
-        }
-        
-        .rule-header:hover {
-            background-color: #2a2a2a;
-        }
-        
-        .rule-number {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #ff5722;
-            margin-right: 15px;
-            width: 40px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .rule-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            flex-grow: 1;
-        }
-        
-        .arrow {
-            margin-left: 15px;
-            width: 20px;
-            height: 20px;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-        
-        .arrow::before, .arrow::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 2px;
-            background-color: #ff5722;
-            top: 9px;
-        }
-        
-        .arrow::before {
-            left: 0;
-            transform: rotate(45deg);
-        }
-        
-        .arrow::after {
-            right: 0;
-            transform: rotate(-45deg);
-        }
-        
-        .rule-content {
-            background-color: #212121;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-        }
-        
-        .rule-inner {
-            padding: 20px 25px 20px 75px;
-            color: #cccccc;
-        }
-        
-        .rule-inner p {
-            margin-bottom: 15px;
-        }
-        
-        .rule-inner p:last-child {
-            margin-bottom: 0;
-        }
-        
-        .rule-inner ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .rule-inner li {
-            margin-bottom: 8px;
-        }
-        
-        .rule-inner li:last-child {
-            margin-bottom: 0;
-        }
-        
-        .highlight {
-            color: #ff9e80;
-            font-weight: 600;
-        }
-        
-        .active .arrow {
-            transform: rotate(180deg);
-        }
-        
-        .active .rule-header {
-            background-color: #2a2a2a;
-        }
-        
-        .glow-effect {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(255, 61, 0, 0.15), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .rule-header:hover .glow-effect {
-            opacity: 1;
-        }
-        
-        .example {
-            background-color: #252525;
-            border-left: 3px solid #ff5722;
-            padding: 12px 15px;
-            margin: 15px 0;
-            border-radius: 0 4px 4px 0;
-        }
-        
-        .example-title {
-            color: #ff9e80;
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .server-name {
-                font-size: 2.5rem;
-            }
-            
-            .rule-number {
-                font-size: 1.2rem;
-                width: 30px;
-            }
-            
-            .rule-title {
-                font-size: 1rem;
-            }
-            
-            .rule-inner {
-                padding: 15px 15px 15px 55px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .server-name {
-                font-size: 2rem;
-            }
-            
-            header {
-                padding: 30px 0;
-            }
-            
-            .logo-container {
-                height: 80px;
-            }
-        }
-    </style>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/poppins/1.0.0/fonts/poppins-regular.woff2" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>D▲RT-404</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: 
+        radial-gradient(ellipse at top, #000000 0%, #0a0000 30%, #000000 100%),
+        linear-gradient(135deg, #000000 0%, #0d0000 25%, #000000 50%, #0a0000 75%, #000000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: white;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 15% 15%, rgba(255, 0, 0, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(255, 50, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 50, 0.05) 0%, transparent 60%),
+        linear-gradient(45deg, transparent 49%, rgba(255, 0, 0, 0.02) 50%, transparent 51%);
+      pointer-events: none;
+      animation: atmosphereShift 8s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255, 0, 0, 0.01) 2px,
+          rgba(255, 0, 0, 0.01) 4px
+        );
+      pointer-events: none;
+      opacity: 0.3;
+    }
+
+    .glitch-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(90deg, transparent 0%, rgba(255, 0, 0, 0.03) 50%, transparent 100%);
+      animation: glitchSweep 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .container {
+      text-align: center;
+      z-index: 10;
+      animation: fadeIn 2s ease-out;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 7rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff0000, #ff4400, #ffaa00, #ff6600, #ff0033, #ff0000);
+      background-size: 600% 600%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 40px;
+      filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.4)) drop-shadow(0 0 60px rgba(255, 0, 0, 0.2));
+      animation: 
+        gradientShift 4s ease-in-out infinite,
+        textGlow 3s ease-in-out infinite alternate,
+        subtleGlitch 5s ease-in-out infinite;
+      letter-spacing: 4px;
+      position: relative;
+    }
+
+    h1::before {
+      content: 'D▲RT-404';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255, 0, 0, 0.1), transparent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glitchText 3s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    .subtitle {
+      font-size: 1.6rem;
+      color: #f0f0f0;
+      text-align: center;
+      max-width: 800px;
+      line-height: 1.7;
+      margin-bottom: 50px;
+      opacity: 0.95;
+      animation: slideUp 1.5s ease-out 0.8s both;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    .status-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 25px;
+      animation: slideUp 1.5s ease-out 1.2s both;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 15px 30px;
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    .pulse-dot {
+      width: 14px;
+      height: 14px;
+      background: radial-gradient(circle, #ff0000, #cc0000);
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    .status-text {
+      color: #ff9999;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .progress-bar {
+      width: 300px;
+      height: 4px;
+      background: rgba(255, 0, 0, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff0000, #ff6600, #ff0000);
+      border-radius: 2px;
+      animation: progressFlow 3s ease-in-out infinite;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    }
+
+    .error-code {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      font-family: 'Courier New', 'Monaco', monospace;
+      font-size: 1rem;
+      color: #777;
+      opacity: 0.8;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 8px 12px;
+      border-radius: 4px;
+      border-left: 3px solid #ff0000;
+      animation: codeFlicker 4s ease-in-out infinite;
+    }
+
+    .version-info {
+      position: absolute;
+      bottom: 25px;
+      left: 25px;
+      font-family: 'Courier New', 'Monaco', monospace;
+      font-size: 0.9rem;
+      color: #666;
+      opacity: 0.7;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(60px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes gradientShift {
+      0%, 100% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+
+    @keyframes textGlow {
+      from {
+        filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.4)) drop-shadow(0 0 60px rgba(255, 0, 0, 0.2));
+      }
+      to {
+        filter: drop-shadow(0 0 50px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 100px rgba(255, 0, 0, 0.4));
+      }
+    }
+
+    @keyframes subtleGlitch {
+      0%, 90%, 100% {
+        transform: translateX(0);
+      }
+      92% {
+        transform: translateX(2px);
+      }
+      94% {
+        transform: translateX(-1px);
+      }
+      96% {
+        transform: translateX(1px);
+      }
+    }
+
+    @keyframes glitchText {
+      0%, 95% {
+        opacity: 0;
+        transform: translateX(0);
+      }
+      96% {
+        opacity: 0.3;
+        transform: translateX(3px);
+      }
+      97% {
+        opacity: 0.2;
+        transform: translateX(-2px);
+      }
+      98% {
+        opacity: 0.4;
+        transform: translateX(1px);
+      }
+      99%, 100% {
+        opacity: 0;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.6);
+        opacity: 0.4;
+      }
+    }
+
+    @keyframes statusPulse {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
+      }
+    }
+
+    @keyframes progressFlow {
+      0% {
+        width: 0%;
+        transform: translateX(-100%);
+      }
+      50% {
+        width: 100%;
+        transform: translateX(0);
+      }
+      100% {
+        width: 0%;
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes atmosphereShift {
+      0%, 100% {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: rotate(0.5deg) scale(1.02);
+      }
+    }
+
+    @keyframes glitchSweep {
+      0%, 90% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      91% {
+        opacity: 0.3;
+      }
+      95% {
+        transform: translateX(100%);
+        opacity: 0.1;
+      }
+      100% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    @keyframes codeFlicker {
+      0%, 95% {
+        opacity: 0.8;
+      }
+      96%, 98% {
+        opacity: 0.4;
+      }
+      99%, 100% {
+        opacity: 0.8;
+      }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 5rem;
+        letter-spacing: 2px;
+      }
+      .subtitle {
+        font-size: 1.3rem;
+        padding: 0 20px;
+      }
+      .error-code {
+        top: 15px;
+        right: 15px;
+        font-size: 0.9rem;
+      }
+      .version-info {
+        bottom: 15px;
+        left: 15px;
+        font-size: 0.8rem;
+      }
+      .progress-bar {
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 3.5rem;
+        letter-spacing: 1px;
+      }
+      .subtitle {
+        font-size: 1.1rem;
+      }
+      .status-indicator {
+        padding: 12px 20px;
+        gap: 10px;
+      }
+      .status-text {
+        font-size: 0.9rem;
+      }
+      .progress-bar {
+        width: 200px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="cyber-lines"></div>
-            <div class="logo-container">
-                <h1 class="server-name">DART404</h1>
-            </div>
-            <h1>Правила сервера</h1>
-            <p class="subtitle">Ознакомьтесь с правилами перед началом игры</p>
-        </header>
-        
-        <div class="rules-container">
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">1</div>
-                    <div class="rule-title">Гриферство и обман игроков запрещены</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Гриферство, то есть умышленное разрушение построек других игроков, кража ресурсов или порча территории считается серьезным нарушением.</p>
-                        
-                        <p>Под обманом понимается:</p>
-                        <ul>
-                            <li>Ложные обещания обмена ресурсами</li>
-                            <li>Кража предметов из сундуков других игроков</li>
-                            <li>Намеренное введение в заблуждение новичков</li>
-                            <li>Мошенничество при торговле</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Пример нарушения:</span>
-                            Игрок предлагает обмен ресурсами, но после получения предметов от другого игрока отказывается выполнять свою часть сделки и покидает сервер.
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> временный бан от 1 дня до 7 дней в зависимости от тяжести нарушения. При повторном нарушении - перманентный бан.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">2</div>
-                    <div class="rule-title">Реклама других серверов запрещена</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Запрещается рекламировать другие серверы Minecraft или любые посторонние ресурсы без согласования с администрацией.</p>
-                        
-                        <p>Это включает в себя:</p>
-                        <ul>
-                            <li>Размещение IP-адресов других серверов</li>
-                            <li>Приглашение игроков на другие серверы</li>
-                            <li>Распространение ссылок на сторонние Discord-серверы</li>
-                            <li>Реклама в чате, табличках, книгах и т.д.</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Пример нарушения:</span>
-                            Отправка сообщения в общий чат: "Ребята, заходите на мой сервер play.example.com, там круче!"
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> предупреждение при первом нарушении, бан на 3 дня при повторном нарушении, перманентный бан при систематических нарушениях.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">3</div>
-                    <div class="rule-title">Оскорбления, токсичность и провокации — бан</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Мы стремимся создать дружелюбное и комфортное сообщество. Неуважительное поведение по отношению к другим игрокам строго запрещено.</p>
-                        
-                        <p>Запрещается:</p>
-                        <ul>
-                            <li>Использование оскорбительной лексики в любой форме</li>
-                            <li>Провокации конфликтов между игроками</li>
-                            <li>Травля и преследование игроков</li>
-                            <li>Спам и флуд в чате</li>
-                            <li>Угрозы в адрес других игроков</li>
-                            <li>Распространение личной информации игроков</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Пример нарушения:</span>
-                            Постоянные оскорбления в чате, преследование определенного игрока с целью испортить ему игровой процесс.
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> мут на 1-24 часа при первом нарушении, бан на 1-7 дней при повторных нарушениях, перманентный бан при систематическом нарушении.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">4</div>
-                    <div class="rule-title">Запрещено использовать читы и баги</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Использование любых читов, хаков, модов, дающих преимущество над другими игроками, строго запрещено.</p>
-                        
-                        <p>К запрещенным действиям относятся:</p>
-                        <ul>
-                            <li>Использование программ автоматизации действий (автокликеры и т.п.)</li>
-                            <li>Намеренное использование багов игры для получения выгоды</li>
-                            <li>Применение модов, изменяющих функциональность клиента</li>
-                            <li>Использование любых инструментов, позволяющих получить нечестное преимущество</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Пример нарушения:</span>
-                            Игрок использует X-Ray текстуры для поиска алмазов и других ценных ресурсов под землей.
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> бан на 7-30 дней при первом нарушении, перманентный бан при повторном нарушении.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">5</div>
-                    <div class="rule-title">Администрация не возвращает потерянные вещи</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Администрация не восстанавливает предметы, потерянные в результате лага, смерти, багов или других игровых ситуаций.</p>
-                        
-                        <p>Это правило действует в следующих случаях:</p>
-                        <ul>
-                            <li>Гибель в лаве, пустоте или от мобов</li>
-                            <li>Потеря предметов из-за сбоев сервера</li>
-                            <li>Потеря предметов из-за вылета клиента</li>
-                            <li>Кража вещей другими игроками (будет рассмотрена по правилу №1)</li>
-                        </ul>
-                        
-                        <p><span class="highlight">Рекомендация:</span> всегда имейте при себе огниво и ведро воды для непредвиденных ситуаций.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">6</div>
-                    <div class="rule-title">Запрещены лаг-машины и любые лаг-структуры</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Создание механизмов и структур, намеренно вызывающих лаги и замедляющих работу сервера, строго запрещено.</p>
-                        
-                        <p>К запрещенным структурам относятся:</p>
-                        <ul>
-                            <li>Механизмы с большим количеством движущихся элементов</li>
-                            <li>Фермы с чрезмерным количеством мобов</li>
-                            <li>Устройства с редстоуном, создающие постоянную нагрузку</li>
-                            <li>Механизмы с большим количеством сущностей (предметы, выброшенные на землю)</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Пример нарушения:</span>
-                            Создание фермы с более чем 100 животными в одном чанке или редстоун-механизма, вызывающего значительное снижение TPS сервера.
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> предупреждение и удаление структуры при первом нарушении, временный бан на 1-7 дней при повторном нарушении.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">7</div>
-                    <div class="rule-title">Постройки не должны нарушать атмосферу сервера</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Запрещено создавать постройки, которые могут оскорбить чувства других игроков или нарушить общую атмосферу сервера.</p>
-                        
-                        <p>К запрещенным постройкам относятся:</p>
-                        <ul>
-                            <li>Непристойные и вульгарные строения</li>
-                            <li>Постройки, изображающие запрещенную символику</li>
-                            <li>Структуры, содержащие оскорбительные послания</li>
-                            <li>Любые строения, нарушающие общие нормы приличия</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Пример нарушения:</span>
-                            Создание структуры с оскорбительными надписями или запрещенными символами, видимыми на карте или в игровом мире.
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> предупреждение и снос постройки при первом нарушении, временный бан на 1-7 дней при повторном нарушении.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">8</div>
-                    <div class="rule-title">Список запрещённых модов</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>На сервере запрещено использование определенных модификаций, которые дают нечестное преимущество.</p>
-                        
-                        <p>Запрещенные моды включают в себя, но не ограничиваются следующими:</p>
-                        <ul>
-                            <li><span class="highlight">X-Ray</span> - позволяет видеть руду сквозь блоки</li>
-                            <li><span class="highlight">FreeCam</span> - позволяет перемещать камеру независимо от персонажа</li>
-                            <li><span class="highlight">GuiMove</span> - позволяет двигаться с открытыми интерфейсами</li>
-                            <li><span class="highlight">Killaura</span> - автоматически атакует ближайших мобов или игроков</li>
-                            <li><span class="highlight">Speed/Fly</span> - ускоряют передвижение или позволяют летать</li>
-                            <li><span class="highlight">AutoClicker</span> - автоматически кликает за игрока</li>
-                            <li>Любые другие моды, дающие нечестное преимущество</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Разрешенные моды:</span>
-                            Minimap (без функции обнаружения мобов и пещер), Optifine, Sodium, JourneyMap (без радара), инвентарь-сортировщики и косметические моды.
-                        </div>
-                        
-                        <p><span class="highlight">Наказание:</span> бан на 7-30 дней при первом нарушении, перманентный бан при повторном нарушении.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="rule-item">
-                <div class="rule-header">
-                    <div class="rule-number">9</div>
-                    <div class="rule-title">Администрация может изменять правила без предупреждения</div>
-                    <div class="arrow"></div>
-                    <div class="glow-effect"></div>
-                </div>
-                <div class="rule-content">
-                    <div class="rule-inner">
-                        <p>Администрация оставляет за собой право изменять правила сервера без предварительного уведомления игроков.</p>
-                        
-                        <p>Дополнительная информация:</p>
-                        <ul>
-                            <li>Незнание правил не освобождает от ответственности</li>
-                            <li>Регулярно проверяйте обновления правил на сервере</li>
-                            <li>Администрация имеет право трактовать ситуации индивидуально</li>
-                            <li>В спорных случаях решение администрации является окончательным</li>
-                        </ul>
-                        
-                        <div class="example">
-                            <span class="example-title">Важно:</span>
-                            Войдя на сервер, вы автоматически соглашаетесь со всеми установленными правилами. Рекомендуется периодически проверять актуальную версию правил.
-                        </div>
-                        
-                        <p><span class="highlight">Совет:</span> при возникновении спорных ситуаций или вопросов обращайтесь к администрации сервера в Discord</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="glitch-overlay"></div>
+  <div class="error-code">ERR_PLANET_CORE_404</div>
+  <div class="version-info">v2.1.7-alpha</div>
+  
+  <div class="container">
+    <h1>DART404</h1>
+    <p class="subtitle">Wystąpiły problemy z jądrem planety, próba przywrócenia wszystkiego</p>
+    
+    <div class="status-container">
+      <div class="status-indicator">
+        <div class="pulse-dot"></div>
+        <span class="status-text">System odzyskiwania aktywny</span>
+      </div>
+      
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const ruleHeaders = document.querySelectorAll('.rule-header');
-            
-            ruleHeaders.forEach(header => {
-                header.addEventListener('click', function() {
-                    const parent = this.parentElement;
-                    const content = this.nextElementSibling;
-                    
-                    document.querySelectorAll('.rule-item.active').forEach(item => {
-                        if (item !== parent) {
-                            item.classList.remove('active');
-                            item.querySelector('.rule-content').style.maxHeight = null;
-                        }
-                    });
-                    
-                    parent.classList.toggle('active');
-                    if (parent.classList.contains('active')) {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    } else {
-                        content.style.maxHeight = null;
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.rule-item').forEach((item, index) => {
-                setTimeout(() => {
-                    item.style.animation = 'fadeIn 0.5s forwards';
-                }, 100 + index * 100);
-            });
-        });
-    </script>
+  </div>
 </body>
 </html>
